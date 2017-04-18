@@ -1,0 +1,34 @@
+- hosts: localhost
+  connection: local
+  vars:
+    region: "us-east-1"
+  tasks:
+    - name: Get Bastion EC2 ID
+      ec2_remote_facts:
+        region: "{{ region }}"
+        filters:
+          "tag:Name": markwardt-bastion
+      register: ec2_facts
+ 
+    - name: Destroy Bastion
+      ec2:
+        instance_ids: "{{ item.id }}"
+        state: absent
+        region: "{{ region }}"
+      with_items: "{{ ec2_facts.instances }}"
+
+
+    - name: Get Web EC2 ID
+      ec2_remote_facts:
+        region: "{{ region }}"
+        filters:
+          "tag:Name": markwardt-web
+      register: ec2_facts_web
+ 
+    - name: Destroy Web
+      ec2:
+        instance_ids: "{{ item.id }}"
+        state: absent
+        region: "{{ region }}"
+      with_items: "{{ ec2_facts_web.instances }}"
+

@@ -1,0 +1,29 @@
+- hosts: localhost
+  connection: local
+  vars:
+    region: "us-east-1"
+    ec2_id: "ami-22ce4934"
+    key_pair: "pythian-markwardt"
+  tasks:
+    - name: "Get Subnet ID for markwardt-public"
+      ec2_vpc_subnet_facts:
+        region: "{{ region }}"
+        filters:
+          "tag:Name": markwardt-public
+      register: subnet_public
+    - name: Get web SG ID
+      ec2_group_facts:
+        filters:
+          group-name: markwardt-web
+      register: web_sg
+    - name: Get bastion SG ID
+      ec2_group_facts:
+        filters:
+          group-name: markwardt-bastion
+      register: bastion_sg
+
+    - name: Bastion ID Results
+      debug:
+        var: bastion_sg
+    
+   

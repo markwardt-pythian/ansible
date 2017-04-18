@@ -1,0 +1,40 @@
+- hosts: localhost
+  connection: local
+  vars:
+    region: "us-east-1"
+    vpc_id: "vpc-493b342f"
+    private_subnet: "subnet-fc540999"
+    mysql_sg: "sg-c2f6d0bd"
+    ec2_id: "ami-22ce4934"
+    key_pair: "pythian-markwardt"
+  tasks:
+    - name: "Get Subnet ID for markwardt-private1"
+      ec2_vpc_subnet_facts:
+        region: "{{ region }}"
+        filters:
+          "tag:Name": markwardt-private1
+      register: subnet_private1
+    
+    - name: "Get Subnet ID for markwardt-private2"
+      ec2_vpc_subnet_facts:
+        region: "{{ region }}"
+        filters:
+          "tag:Name": markwardt-private2
+      register: subnet_private2
+
+    - name: Build RDS Subnet Group
+      rds_subnet_group:
+        region: "{{ region }}"
+        state: present
+        name: markwardt-subnetgroup
+        description: Subnet Group for Markwardt Testing
+        subnets:
+          - "{{ subnet_private1['subnets'][0]['id'] }}"
+          - "{{ subnet_private2['subnets'][0]['id'] }}"
+      register: subnet_group_results
+
+    - name: Subnet group results
+      debug:
+        var: subnet_group_results
+
+    
