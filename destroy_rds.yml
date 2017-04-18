@@ -2,15 +2,10 @@
   connection: local
   vars:
     region: "us-east-1"
-    vpc_id: "vpc-493b342f"
-    public_subnet: "subnet-fc540999"
-    bastion_sg: "sg-fbe8ce84"
-    web_sg: "sg-e7eacc98"
-    ec2_id: "ami-22ce4934"
-    key_pair: "pythian-markwardt"
+    rds_name: markwardt-rds
   tasks:
     - name: Remove RDS Instance
       rds:
         region: "{{ region }}"
         command: delete
-        instance_name: markwardt-rds
+        instance_name: "{{ rds_name }}"

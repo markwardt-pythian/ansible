@@ -2,11 +2,7 @@
   connection: local
   vars:
     region: "us-east-1"
-    vpc_id: "vpc-493b342f"
-    private_subnet: "subnet-fc540999"
-    mysql_sg: "sg-c2f6d0bd"
-    ec2_id: "ami-22ce4934"
-    key_pair: "pythian-markwardt"
+    subnet_group_name: markwardt-subnetgroup
   tasks:
     - name: "Get Subnet ID for markwardt-private1"
       ec2_vpc_subnet_facts:
@@ -22,11 +18,18 @@
           "tag:Name": markwardt-private2
       register: subnet_private2
 
+    - name: Get MySQL SG ID
+      ec2_group_facts:
+        region: "{{ region }}"
+        filters:
+          group-name: markwardt-private
+      register: private_sg
+
     - name: Build RDS Subnet Group
       rds_subnet_group:
         region: "{{ region }}"
         state: present
-        name: markwardt-subnetgroup
+        name: "{{ subnet_group_name }}"
         description: Subnet Group for Markwardt Testing
         subnets:
           - "{{ subnet_private1['subnets'][0]['id'] }}"
@@ -37,4 +40,24 @@
       debug:
         var: subnet_group_results
 
-    
+    - name: Build RDS Instance
+      rds:
+        command: create
+        instance_name: markwardt-rds
+        db_engine: MySQL
+        size: 10
+        instance_type: db.m1.small
+        username: root
+        password: pythian1
+        region: "{{ region }}"
+        subnet: "{{ subnet_group_name }}"
+        vpc_security_groups: "{{ private_sg['security_groups'][0]['group_id'] }}"
+        multi_zone: yes
+        tags:
+          Environment: testing
+          Application: ansible
+      register: rds_results
+
+    - name: RDS rds results
+      debug:
+        var: rds_results

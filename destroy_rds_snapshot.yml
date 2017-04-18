@@ -1,0 +1,16 @@
+# Ansible does not have a way to dynamically discover the RDS snapshots so we will have to pass the names into the playbook
+# Example to use this playbook:
+# ansible-playbook destroy_rds.yml --extra-vars='{"snapshots": ["snapshot-2017-04-18-17-25-07", "snapshot1"]}'
+
+- hosts: localhost
+  connection: local
+  vars:
+    region: "us-east-1"
+    rds_name: markwardt-rds
+  tasks:
+    - name: Gather RDS Facts
+      rds:
+        region: "{{ region }}"
+        command: delete
+        snapshot: "{{ item }}"
+      with_items: "{{ snapshots }}"

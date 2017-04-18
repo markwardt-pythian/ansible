@@ -1,0 +1,12 @@
+- hosts: localhost
+  connection: local
+  vars:
+    region: "us-east-1"
+    rds_name: markwardt-rds
+  tasks:
+    - name: Create RDS Snapshot
+      rds:
+        region: "{{ region }}"
+        command: snapshot
+        instance_name: "{{ rds_name }}"
+        snapshot: "Snapshot-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
