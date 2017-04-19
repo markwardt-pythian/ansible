@@ -5,6 +5,9 @@
     ec2_id: "ami-22ce4934"
     key_pair: "pythian-markwardt"
   tasks:
+    - name: "Start new HOSTS file"
+      shell: "echo '[bastion]' > hosts"
+
     - name: "Get Public Subnet ID"
       ec2_vpc_subnet_facts:
         region: "{{ region }}"
@@ -47,11 +50,22 @@
         image: "{{ ec2_id }}"
         wait: yes
         wait_timeout: 500
-        count: 1
+        exact_count: 1
         instance_tags:
           Name: markwardt-bastion
+          Environment: Dev
+        count_tag: 
+          Name: markwardt-bastion
+          Environment: Dev
         vpc_subnet_id: "{{ markwardt_public['subnets'][0]['id'] }}"
         assign_public_ip: yes
+      register: bastion_facts
+    
+    - debug: "var=bastion_facts['instances'][0]['public_ip']"
+
+    - name: Add Bastion to hosts file
+      shell: "echo 'bastion ansible_host={{ bastion_facts['instances'][0]['public_ip'] }} ansible_user=ec2-user' >> hosts;echo '' >> hosts"
+
     - name: Create Web
       ec2:
         region: "{{ region }}"
@@ -61,11 +75,18 @@
         image: "{{ ec2_id }}"
         wait: yes
         wait_timeout: 500
-        count: 1
+        exact_count: 1
         instance_tags:
           Name: markwardt-web
+          Environment: Dev
+        count_tag: 
+          Name: markwardt-web
+          Environment: Dev
         vpc_subnet_id: "{{ markwardt_public['subnets'][0]['id'] }}"
         assign_public_ip: yes
-        
+      register: web_facts
+    
+    - name: Add Web Server to hosts file
+      shell: "echo '[web]' >> hosts; echo 'webserver ansible_host={{ web_facts['instances'][0]['private_ip'] }} ansible_port=22 ansible_user=ec2-user' >> hosts;echo '' >> hosts"
     
    
