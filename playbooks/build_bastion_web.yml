@@ -5,9 +5,10 @@
     ec2_id: "ami-22ce4934"
     key_pair: "pythian-markwardt"
     host_path: "../hosts"
+    ssh_key_path: "/Users/kmarkwardt/.ssh/pythian-markwardt.pem"
   tasks:
     - name: "Start new HOSTS file"
-      shell: "echo '[bastion]' > hosts"
+      shell: "echo '[bastion]' > {{ host_path }}"
 
     - name: "Get Public Subnet ID"
       ec2_vpc_subnet_facts:
@@ -65,8 +66,21 @@
     - debug: "var=bastion_facts"
 
     - name: Add Bastion to hosts file
-      shell: "echo 'bastion ansible_host={{ bastion_facts['instances'][0]['public_ip'] }} ansible_user=ec2-user' >> {{ host_path }};echo '' >> {{ host_path }}"
+      set_fact: 
+        bastion_public_ip: "{{ bastion_facts['instances'][0]['public_ip'] }}"
+      when: bastion_facts['instances'] | length > 0
+  
+    - name: Add Bastion to hosts file
+      set_fact: 
+        bastion_public_ip: "{{ bastion_facts['tagged_instances'][0]['public_ip'] }}"
+      when: bastion_facts['tagged_instances'] | length > 0
 
+    - name: Add Bastion to hosts file
+      shell: "echo 'bastion ansible_host={{ bastion_public_ip }} ansible_user=ec2-user' >> {{ host_path }};echo '' >> {{ host_path }}"
+
+    - name: Copy SSH Key to Bastion
+      shell: "scp -i {{ ssh_key_path }} {{ ssh_key_path }} ec2-user@{{bastion_public_ip }}:~/.ssh/"
+    
     - name: Create Web
       ec2:
         region: "{{ region }}"
@@ -89,5 +103,13 @@
     
     - name: Add Web Server to hosts file
       shell: "echo '[web]' >> {{ host_path }}; echo 'webserver ansible_host={{ web_facts['instances'][0]['private_ip'] }} ansible_port=22 ansible_user=ec2-user' >> {{ host_path }};echo '' >> {{ host_path }}"
+      when: web_facts['instances'] | length > 0
     
+    - name: Add Web Server to hosts file
+      shell: "echo '[web]' >> {{ host_path }}; echo 'webserver ansible_host={{ web_facts['tagged_instances'][0]['private_ip'] }} ansible_port=22 ansible_user=ec2-user' >> {{ host_path }};echo '' >> {{ host_path }}"
+      when: web_facts['tagged_instances'] | length > 0
+
+
+
+
    

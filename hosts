@@ -1,6 +1,6 @@
 [bastion]
-bastion ansible_host=184.73.98.80 ansible_user=ec2-user
+bastion ansible_host=54.208.79.51 ansible_user=ec2-user
 
 [web]
-webserver ansible_host=10.4.0.211 ansible_port=22 ansible_user=ec2-user
+webserver ansible_host=10.4.0.188 ansible_port=22 ansible_user=ec2-user
 
