@@ -52,6 +52,8 @@
         region: "{{ region }}"
         subnet: "{{ subnet_group_name }}"
         vpc_security_groups: "{{ private_sg['security_groups'][0]['group_id'] }}"
+        wait: yes
+        wait_timeout: 1200
         multi_zone: yes
         tags:
           Environment: testing

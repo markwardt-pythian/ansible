@@ -1,0 +1,14 @@
+- hosts: localhost
+  connection: local
+  vars:
+    region: us-east-1
+    rds_name: markwardt-rds
+  tasks:
+    - name: Create RDS Replica
+      rds:
+        region: "{{ region }}"
+        command: replicate
+        instance_name: "{{ rds_name }}" 
+        source_instance: new_database
+        wait: yes
+        wait_timeout: 600

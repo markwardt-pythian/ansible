@@ -65,12 +65,12 @@
     
     - debug: "var=bastion_facts"
 
-    - name: Add Bastion to hosts file
+    - name: Capture Bastion public IP
       set_fact: 
         bastion_public_ip: "{{ bastion_facts['instances'][0]['public_ip'] }}"
       when: bastion_facts['instances'] | length > 0
   
-    - name: Add Bastion to hosts file
+    - name: Capture Bastion public IP
       set_fact: 
         bastion_public_ip: "{{ bastion_facts['tagged_instances'][0]['public_ip'] }}"
       when: bastion_facts['tagged_instances'] | length > 0
@@ -78,9 +78,6 @@
     - name: Add Bastion to hosts file
       shell: "echo 'bastion ansible_host={{ bastion_public_ip }} ansible_user=ec2-user' >> {{ host_path }};echo '' >> {{ host_path }}"
 
-    - name: Copy SSH Key to Bastion
-      shell: "scp -i {{ ssh_key_path }} {{ ssh_key_path }} ec2-user@{{bastion_public_ip }}:~/.ssh/"
-    
     - name: Create Web
       ec2:
         region: "{{ region }}"
@@ -101,15 +98,15 @@
         assign_public_ip: yes
       register: web_facts
     
-    - name: Add Web Server to hosts file
-      shell: "echo '[web]' >> {{ host_path }}; echo 'webserver ansible_host={{ web_facts['instances'][0]['private_ip'] }} ansible_port=22 ansible_user=ec2-user' >> {{ host_path }};echo '' >> {{ host_path }}"
+    - name: Capture Web public IP
+      set_fact: 
+        web_public_ip: "{{ web_facts['instances'][0]['public_ip'] }}"
       when: web_facts['instances'] | length > 0
-    
-    - name: Add Web Server to hosts file
-      shell: "echo '[web]' >> {{ host_path }}; echo 'webserver ansible_host={{ web_facts['tagged_instances'][0]['private_ip'] }} ansible_port=22 ansible_user=ec2-user' >> {{ host_path }};echo '' >> {{ host_path }}"
+  
+    - name: Capture Web public IP
+      set_fact: 
+        web_public_ip: "{{ web_facts['tagged_instances'][0]['public_ip'] }}"
       when: web_facts['tagged_instances'] | length > 0
 
-
-
-
-   
+    - name: Add Web to hosts file
+      shell: "echo 'web ansible_host={{ web_public_ip }} ansible_user=ec2-user' >> {{ host_path }};echo '' >> {{ host_path }}"

@@ -2,10 +2,17 @@
   connection: local
   vars:
     region: "us-east-1"
-    rds_name: markwardt-rds
+    aws_network_name: markwardt
   tasks:
     - name: Remove RDS Instance
       rds:
         region: "{{ region }}"
         command: delete
-        instance_name: "{{ rds_name }}"
+        instance_name: "{{ aws_network_name }}-rds"
+        wait: yes
+        wait_timeout: 1200
+    - name: Remove RDS Subnet Group
+      rds_subnet_group:
+        region: "{{ region }}"
+        state: absent
+        name: "{{ aws_network_name }}-subnetgroup"

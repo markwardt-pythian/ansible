@@ -2,12 +2,13 @@
   connection: local
   vars:
     region: "us-east-1"
+    aws_network_name: markwardt
   tasks:
     - name: Get Bastion EC2 ID
       ec2_remote_facts:
         region: "{{ region }}"
         filters:
-          "tag:Name": markwardt-bastion
+          "tag:Name": "{{ aws_network_name }}-bastion"
       register: ec2_facts
  
     - name: Destroy Bastion
@@ -22,7 +23,7 @@
       ec2_remote_facts:
         region: "{{ region }}"
         filters:
-          "tag:Name": markwardt-web
+          "tag:Name": "{{ aws_network_name }}-web"
       register: ec2_facts_web
  
     - name: Destroy Web

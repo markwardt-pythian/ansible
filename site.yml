@@ -1,0 +1,15 @@
+---
+# This playbook deploys the whole AWS Network, Bastion, Web, and RDS Instances.  Web Configuration is currently manual
+# - Must have credentials exported for AWS IAM
+# - Having trouble with Ansible SSH through the bastion
+# - RDS may take up to 30 minutes to deploy the instance
+
+- name: Deploy Site
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+  - aws-network
+  - aws-bastion
+  - aws-rds
+  
