@@ -1,5 +1,5 @@
 ---
-region: us-east-1
-aws_network_name: markwardt
-ec2_id: "ami-22ce4934"
-key_pair: "pythian-markwardt"
+#region: us-east-1
+#aws_network_name: markwardt
+#ec2_id: "ami-22ce4934"
+#key_pair: "pythian-markwardt"

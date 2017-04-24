@@ -1,8 +1,8 @@
 - hosts: localhost
   connection: local
   vars:
-    region: "us-east-1"
-    aws_network_name: markwardt
+    region: "us-west-2"
+    aws_network_name: dev
   tasks:
     - name: Get Bastion EC2 ID
       ec2_remote_facts:

@@ -1,17 +1,15 @@
 ---
 
-region: us-east-1
-aws_network_name: markwardt
-rds_user: root
-rds_pass: Default_Pass123!
-rds_instance_type: db.m1.small
-rds_size_gb: 15
-rds_parameter_engine: mysql5.6
-rds_instance_engine: 5.6.34
-rds_parameters:
-  - { param: 'binlog_format', value: 'ROW' }
-  - { param: 'general_log', value: '1' }
-  - { param: 'testuser1', value: 'wheel' }
-  - { param: 'testuser1', value: 'wheel' }
+#region: us-east-1
+#aws_network_name: markwardt
+#rds_user: root
+#rds_pass: Default_Pass123!
+#rds_instance_type: db.m1.small
+#rds_size_gb: 15
+#rds_parameter_engine: mysql5.6
+#rds_instance_engine: 5.6.34
+#rds_parameters:
+#  - { param: 'binlog_format', value: 'ROW' }
+#  - { param: 'general_log', value: '1' }
 
 

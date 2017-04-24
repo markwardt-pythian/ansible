@@ -1,8 +1,8 @@
 - hosts: localhost
   connection: local
   vars:
-    region: "us-east-1"
-    aws_network_name: markwardt
+    region: "us-west-2"
+    aws_network_name: dev
   tasks:
     - name: Remove RDS Instance
       rds:
@@ -10,9 +10,14 @@
         command: delete
         instance_name: "{{ aws_network_name }}-rds"
         wait: yes
-        wait_timeout: 1200
+        wait_timeout: 1800
     - name: Remove RDS Subnet Group
       rds_subnet_group:
         region: "{{ region }}"
         state: absent
         name: "{{ aws_network_name }}-subnetgroup"
+    - name: Build MySQL Parameters
+      rds_param_group:
+        region: "{{ region }}"
+        state: absent
+        name: "{{ aws_network_name }}-parameters"

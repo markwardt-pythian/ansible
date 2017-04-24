@@ -41,8 +41,9 @@
     state: present
     name: "{{ aws_network_name }}-parameters"
     description: "{{ aws_network_name }} Parameters"
-    engine: "{{ rds_parameter_version }}"
+    engine: "{{ rds_parameter_engine }}"
     immediate: no
+    region: "{{ region }}"
     params: "{{ item.param }}={{ item.value }}"
   with_items: "{{ rds_parameters }}"
 
